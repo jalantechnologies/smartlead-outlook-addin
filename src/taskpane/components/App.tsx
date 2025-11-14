@@ -73,29 +73,61 @@ const App: React.FC = () => {
 
   const extractEmailFromMessage = () => {
     try {
-      // Check if Office.context.mailbox.item exists
-      if (!Office.context.mailbox.item) {
-        setError('No email item found. Please open an email message.');
+      // Check if Office APIs are ready
+      if (!Office || !Office.context || !Office.context.mailbox) {
+        setError('Office APIs not ready. Please reload the add-in.');
         return;
       }
 
-      // Check if from property exists
-      if (!Office.context.mailbox.item.from) {
-        setError('Cannot access sender information. Please ensure you have opened an email message.');
+      const item = Office.context.mailbox.item;
+
+      // Check if we have an email item
+      if (!item) {
+        setError('No email selected. Please select or open an email message.');
         return;
       }
 
-      Office.context.mailbox.item.from.getAsync((result) => {
-        if (result.status === Office.AsyncResultStatus.Succeeded) {
-          const from = result.value;
+      // Try to get sender information
+      // Different Outlook versions may have different API availability
+      if (item.from && typeof item.from.getAsync === 'function') {
+        // Async API (preferred)
+        item.from.getAsync((result) => {
+          if (result.status === Office.AsyncResultStatus.Succeeded && result.value) {
+            const from = result.value;
+            const contact: EmailContact = {
+              email: from.emailAddress,
+              displayName: from.displayName,
+            };
+
+            // Parse first and last name from display name
+            if (from.displayName) {
+              const nameParts = from.displayName.trim().split(' ');
+              if (nameParts.length > 1) {
+                contact.firstName = nameParts[0];
+                contact.lastName = nameParts.slice(1).join(' ');
+              } else {
+                contact.firstName = from.displayName;
+              }
+            }
+
+            setEmailContact(contact);
+            setError(''); // Clear any previous errors
+          } else {
+            console.error('getAsync failed:', result.error);
+            setError('Unable to read sender information. The email may not be fully loaded.');
+          }
+        });
+      } else if (item.from) {
+        // Synchronous property access (fallback for older versions)
+        const from = item.from as any;
+        if (from.emailAddress && from.displayName) {
           const contact: EmailContact = {
             email: from.emailAddress,
             displayName: from.displayName,
           };
 
-          // Try to parse first and last name from display name
           if (from.displayName) {
-            const nameParts = from.displayName.split(' ');
+            const nameParts = from.displayName.trim().split(' ');
             if (nameParts.length > 1) {
               contact.firstName = nameParts[0];
               contact.lastName = nameParts.slice(1).join(' ');
@@ -105,11 +137,13 @@ const App: React.FC = () => {
           }
 
           setEmailContact(contact);
+          setError('');
         } else {
-          console.error('Office.js error:', result.error);
-          setError(`Failed to extract email: ${result.error?.message || 'Unknown error'}`);
+          setError('Sender information not available for this message.');
         }
-      });
+      } else {
+        setError('This add-in requires access to sender information. Please ensure you have selected an email message.');
+      }
     } catch (err) {
       console.error('Error extracting email:', err);
       setError(`Error: ${err instanceof Error ? err.message : 'Failed to extract email from message'}`);
