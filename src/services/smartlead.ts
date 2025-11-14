@@ -79,15 +79,10 @@ class SmartleadService {
 
         // Fetch campaign join dates for each campaign
         if (lead.lead_campaign_data && lead.lead_campaign_data.length > 0) {
-          console.log('Fetching dates for', lead.lead_campaign_data.length, 'campaigns');
-
           const campaignPromises = lead.lead_campaign_data.map(async (campaignData: any) => {
             try {
-              console.log(`Fetching campaign ${campaignData.campaign_id} leads...`);
-              // Build URL with query parameters manually to avoid any encoding issues
-              // API max limit is 100
+              // Build URL with query parameters manually - API max limit is 100
               const url = `${BASE_URL}/campaigns/${campaignData.campaign_id}/leads?api_key=${this.apiKey}&limit=100`;
-              console.log(`Fetching URL: ${url}`);
 
               const campResponse = await axios.get(url, {
                 headers: {
@@ -98,15 +93,9 @@ class SmartleadService {
 
               // Find this lead in the campaign's lead list
               const campaignLeads = campResponse.data?.data || [];
-              console.log(`Campaign ${campaignData.campaign_id} has ${campaignLeads.length} leads`);
-
-              const leadInCampaign = campaignLeads.find((cl: any) => {
-                const matches = cl.lead?.email?.toLowerCase() === email.toLowerCase();
-                if (matches) {
-                  console.log(`Found lead in campaign ${campaignData.campaign_id}, created_at:`, cl.created_at);
-                }
-                return matches;
-              });
+              const leadInCampaign = campaignLeads.find((cl: any) =>
+                cl.lead?.email?.toLowerCase() === email.toLowerCase()
+              );
 
               if (leadInCampaign && leadInCampaign.created_at) {
                 return {
@@ -114,19 +103,21 @@ class SmartleadService {
                   created_at: leadInCampaign.created_at,
                 };
               }
-              console.warn(`Lead not found in campaign ${campaignData.campaign_id} leads list`);
               return campaignData;
             } catch (err: any) {
               console.error(`Error fetching campaign ${campaignData.campaign_id} details:`, err);
-              console.error(`Error response:`, err.response?.data);
-              console.error(`Error status:`, err.response?.status);
-              console.error(`Error headers:`, err.response?.headers);
               return campaignData;
             }
           });
 
           lead.lead_campaign_data = await Promise.all(campaignPromises);
-          console.log('Final lead_campaign_data:', lead.lead_campaign_data);
+
+          // Sort campaigns by date added (oldest first)
+          lead.lead_campaign_data.sort((a: any, b: any) => {
+            if (!a.created_at) return 1;
+            if (!b.created_at) return -1;
+            return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          });
         }
 
         return lead;
