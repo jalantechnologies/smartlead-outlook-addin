@@ -21,20 +21,77 @@ const App: React.FC = () => {
   const [success, setSuccess] = useState<string>('');
   const [justAdded, setJustAdded] = useState<boolean>(false);
 
+  // Handle email item changes when taskpane is pinned
+  const handleItemChanged = React.useCallback(() => {
+    // Clear previous state
+    setEmailContact(null);
+    setExistingLead(null);
+    setSelectedCampaignId('');
+    setError('');
+    setSuccess('');
+    setJustAdded(false);
+
+    // Extract new email contact info from the newly selected email
+    try {
+      if (!Office || !Office.context || !Office.context.mailbox) {
+        setError('Office APIs not ready. Please reload the add-in.');
+        return;
+      }
+
+      const item = Office.context.mailbox.item;
+      if (!item) {
+        setError('No email selected. Please select or open an email message.');
+        return;
+      }
+
+      if (item.from) {
+        const from = item.from as any;
+        if (from.emailAddress || from.displayName) {
+          const contact: EmailContact = {
+            email: from.emailAddress || '',
+            displayName: from.displayName || from.emailAddress || '',
+          };
+
+          if (contact.displayName) {
+            const nameParts = contact.displayName.trim().split(' ');
+            if (nameParts.length > 1) {
+              contact.firstName = nameParts[0];
+              contact.lastName = nameParts.slice(1).join(' ');
+            } else {
+              contact.firstName = contact.displayName;
+            }
+          }
+
+          if (!contact.email) {
+            setError('Email address not found. Please ensure the message has a sender.');
+            return;
+          }
+
+          setEmailContact(contact);
+          setError('');
+        } else {
+          setError('Sender information not available for this message.');
+        }
+      } else {
+        setError('This add-in requires access to sender information. Please ensure you have selected an email message.');
+      }
+    } catch (err) {
+      console.error('Error extracting email on item change:', err);
+      setError(`Error: ${err instanceof Error ? err.message : 'Failed to extract email from message'}`);
+    }
+  }, []);
+
   useEffect(() => {
     loadApiKey();
 
-    // Handle email item changes when taskpane is pinned
+    // Register item changed handler when component mounts
     if (Office && Office.context && Office.context.mailbox) {
       Office.context.mailbox.addHandlerAsync(
         Office.EventType.ItemChanged,
-        () => {
-          // When user switches to a different email, refresh the contact info
-          extractEmailFromMessage();
-        }
+        handleItemChanged
       );
     }
-  }, []);
+  }, [handleItemChanged]);
 
   useEffect(() => {
     if (apiKey) {
