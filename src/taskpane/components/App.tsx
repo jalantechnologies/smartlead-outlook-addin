@@ -344,9 +344,12 @@ const App: React.FC = () => {
                   >
                     <option value="">Select a campaign...</option>
                     {campaigns
-                      .filter(campaign =>
-                        campaign.name.toLowerCase().includes(searchQuery.toLowerCase())
-                      )
+                      .filter(campaign => {
+                        if (!searchQuery.trim()) return true;
+                        const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/);
+                        const campaignName = campaign.name.toLowerCase();
+                        return searchTerms.every(term => campaignName.includes(term));
+                      })
                       .map((campaign) => (
                         <option key={campaign.id} value={campaign.id}>
                           {campaign.name}
