@@ -166,6 +166,15 @@ body {
   background-color: #e1dfdd;
 }
 
+.button-success {
+  background-color: #107c10;
+  color: white;
+}
+
+.button-success:hover:not(:disabled) {
+  background-color: #0e6b0e;
+}
+
 .button:disabled {
   opacity: 0.6;
   cursor: not-allowed;

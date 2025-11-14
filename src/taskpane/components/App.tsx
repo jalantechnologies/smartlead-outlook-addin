@@ -19,6 +19,7 @@ const App: React.FC = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+  const [justAdded, setJustAdded] = useState<boolean>(false);
 
   useEffect(() => {
     loadApiKey();
@@ -182,10 +183,15 @@ const App: React.FC = () => {
       await service.addLeadToCampaign(parseInt(selectedCampaignId), lead);
 
       setSuccess(`Successfully added ${emailContact.email} to campaign!`);
+      setJustAdded(true);
 
-      // Clear selection after 3 seconds
+      // Refresh lead data to show updated campaigns
+      checkLeadExists();
+
+      // Clear success state after 3 seconds
       setTimeout(() => {
         setSuccess('');
+        setJustAdded(false);
       }, 3000);
     } catch (err: any) {
       setError(err.message || 'Failed to add lead to campaign');
@@ -258,8 +264,31 @@ const App: React.FC = () => {
               <div className="success-message" style={{ marginTop: '12px' }}>
                 <strong>Lead exists in Smartlead</strong>
                 <div style={{ marginTop: '8px', fontSize: '13px' }}>
-                  {existingLead.first_name && <div>Name: {existingLead.first_name} {existingLead.last_name}</div>}
+                  {existingLead.first_name && (
+                    <div>
+                      Name:{' '}
+                      <a
+                        href={`https://app.smartlead.ai/app/crm/lists/all-leads-old`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: '#1a73e8', textDecoration: 'none' }}
+                      >
+                        {existingLead.first_name} {existingLead.last_name}
+                      </a>
+                    </div>
+                  )}
                   {existingLead.company_name && <div>Company: {existingLead.company_name}</div>}
+                  {existingLead.created_at && (
+                    <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                      Added: {new Date(existingLead.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                  )}
                   {existingLead.lead_campaign_data && existingLead.lead_campaign_data.length > 0 && (
                     <div style={{ marginTop: '12px' }}>
                       <strong>Campaign History:</strong>
@@ -338,11 +367,20 @@ const App: React.FC = () => {
             )}
 
             <button
-              className="button button-primary"
+              className={`button ${justAdded ? 'button-success' : 'button-primary'}`}
               onClick={handleAddToSmartlead}
-              disabled={!selectedCampaignId || submitting}
+              disabled={!selectedCampaignId || submitting || justAdded}
             >
-              {submitting ? 'Adding...' : 'Add to Campaign'}
+              {justAdded ? (
+                <>
+                  <span style={{ marginRight: '6px' }}>✓</span>
+                  Added Successfully
+                </>
+              ) : submitting ? (
+                'Adding...'
+              ) : (
+                'Add to Campaign'
+              )}
             </button>
           </div>
 
