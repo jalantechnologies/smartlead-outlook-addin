@@ -180,6 +180,35 @@ body {
   cursor: not-allowed;
 }
 
+.quick-filters {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.quick-filter-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.quick-filter-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.quick-filter-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .loading {
   text-align: center;
   padding: 40px 20px;

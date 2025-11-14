@@ -108,6 +108,40 @@ const App: React.FC = () => {
     }
   }, [emailContact, apiKey]);
 
+  // Extract prefix from last campaign and auto-populate search
+  useEffect(() => {
+    if (existingLead && existingLead.lead_campaign_data && existingLead.lead_campaign_data.length > 0) {
+      const lastCampaign = existingLead.lead_campaign_data[existingLead.lead_campaign_data.length - 1];
+      if (lastCampaign.campaign_name) {
+        const prefix = lastCampaign.campaign_name.split('-')[0].trim();
+        setSearchQuery(prefix);
+      }
+    }
+  }, [existingLead]);
+
+  // Memoize filtered campaigns
+  const filteredCampaigns = React.useMemo(() => {
+    return campaigns.filter(campaign => {
+      if (!searchQuery.trim()) return true;
+      const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/);
+      const campaignName = campaign.name.toLowerCase();
+      return searchTerms.every(term => campaignName.includes(term));
+    });
+  }, [campaigns, searchQuery]);
+
+  // Auto-select when only 1 campaign matches
+  useEffect(() => {
+    if (filteredCampaigns.length === 1) {
+      setSelectedCampaignId(filteredCampaigns[0].id.toString());
+    } else if (selectedCampaignId) {
+      // Clear selection if currently selected campaign is not in filtered list
+      const stillAvailable = filteredCampaigns.some(c => c.id.toString() === selectedCampaignId);
+      if (!stillAvailable) {
+        setSelectedCampaignId('');
+      }
+    }
+  }, [filteredCampaigns, selectedCampaignId]);
+
   const loadApiKey = () => {
     try {
       const savedApiKey = localStorage.getItem('smartlead_api_key');
@@ -277,6 +311,13 @@ const App: React.FC = () => {
     return name.substring(0, 2).toUpperCase();
   };
 
+  const addQuickFilter = (text: string) => {
+    setSearchQuery(prev => {
+      const current = prev.trim();
+      return current ? `${current} ${text}` : text;
+    });
+  };
+
   if (showSettings) {
     return (
       <Settings
@@ -391,6 +432,32 @@ const App: React.FC = () => {
                     placeholder="Type to search..."
                     disabled={submitting}
                   />
+                  <div className="quick-filters">
+                    <button
+                      type="button"
+                      className="quick-filter-btn"
+                      onClick={() => addQuickFilter('HR')}
+                      disabled={submitting}
+                    >
+                      HR
+                    </button>
+                    <button
+                      type="button"
+                      className="quick-filter-btn"
+                      onClick={() => addQuickFilter('Interview')}
+                      disabled={submitting}
+                    >
+                      Interview
+                    </button>
+                    <button
+                      type="button"
+                      className="quick-filter-btn"
+                      onClick={() => addQuickFilter('Reject')}
+                      disabled={submitting}
+                    >
+                      Reject
+                    </button>
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -405,19 +472,17 @@ const App: React.FC = () => {
                     disabled={submitting}
                   >
                     <option value="">Select a campaign...</option>
-                    {campaigns
-                      .filter(campaign => {
-                        if (!searchQuery.trim()) return true;
-                        const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/);
-                        const campaignName = campaign.name.toLowerCase();
-                        return searchTerms.every(term => campaignName.includes(term));
-                      })
-                      .map((campaign) => (
-                        <option key={campaign.id} value={campaign.id}>
-                          {campaign.name}
-                        </option>
-                      ))}
+                    {filteredCampaigns.map((campaign) => (
+                      <option key={campaign.id} value={campaign.id}>
+                        {campaign.name}
+                      </option>
+                    ))}
                   </select>
+                  {filteredCampaigns.length === 0 && searchQuery.trim() && (
+                    <div className="info-message" style={{ marginTop: '8px', fontSize: '13px' }}>
+                      No campaigns match your search
+                    </div>
+                  )}
                 </div>
               </>
 
