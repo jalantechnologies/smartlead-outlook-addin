@@ -85,7 +85,8 @@ class SmartleadService {
             try {
               console.log(`Fetching campaign ${campaignData.campaign_id} leads...`);
               // Build URL with query parameters manually to avoid any encoding issues
-              const url = `${BASE_URL}/campaigns/${campaignData.campaign_id}/leads?api_key=${this.apiKey}&limit=500`;
+              // API max limit is 100
+              const url = `${BASE_URL}/campaigns/${campaignData.campaign_id}/leads?api_key=${this.apiKey}&limit=100`;
               console.log(`Fetching URL: ${url}`);
 
               const campResponse = await axios.get(url, {
