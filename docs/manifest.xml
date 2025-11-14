@@ -4,13 +4,13 @@
   xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
   xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
   <Id>12345678-1234-1234-1234-123456789abc</Id>
-  <Version>1.0.1.0</Version>
+  <Version>1.0.2.0</Version>
   <ProviderName>Your Company</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Smartlead Integration"/>
   <Description DefaultValue="Add email contacts as leads to Smartlead campaigns"/>
-  <IconUrl DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/assets/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/assets/icon-64.png"/>
+  <IconUrl DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/assets/smartlead-icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/assets/smartlead-icon-64.png"/>
   <SupportUrl DefaultValue="https://www.example.com/support"/>
   <AppDomains>
     <AppDomain>https://jalantechnologies.github.io/smartlead-outlook-addin</AppDomain>
@@ -73,9 +73,9 @@
       </Hosts>
       <Resources>
         <bt:Images>
-          <bt:Image id="Icon.16x16" DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/assets/icon-16.png"/>
-          <bt:Image id="Icon.32x32" DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/assets/icon-32.png"/>
-          <bt:Image id="Icon.80x80" DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/assets/icon-80.png"/>
+          <bt:Image id="Icon.16x16" DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/assets/smartlead-icon-16.png"/>
+          <bt:Image id="Icon.32x32" DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/assets/smartlead-icon-32.png"/>
+          <bt:Image id="Icon.80x80" DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/assets/smartlead-icon-80.png"/>
         </bt:Images>
         <bt:Urls>
           <bt:Url id="Commands.Url" DefaultValue="https://jalantechnologies.github.io/smartlead-outlook-addin/taskpane.html"/>
