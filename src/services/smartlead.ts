@@ -1,6 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import { SmartleadCampaign, SmartleadLead, SmartleadApiResponse } from '../types';
 
+const BASE_URL = 'https://server.smartlead.ai/api/v1';
+
 class SmartleadService {
   private api: AxiosInstance;
   private apiKey: string;
@@ -82,13 +84,14 @@ class SmartleadService {
           const campaignPromises = lead.lead_campaign_data.map(async (campaignData: any) => {
             try {
               console.log(`Fetching campaign ${campaignData.campaign_id} leads...`);
-              const campResponse = await this.api.get(`/campaigns/${campaignData.campaign_id}/leads`, {
+              // Use direct axios call without Authorization header
+              const campResponse = await axios.get(`${BASE_URL}/campaigns/${campaignData.campaign_id}/leads`, {
                 params: {
                   api_key: this.apiKey,
                   limit: 1000,
                 },
                 headers: {
-                  'Authorization': '', // Remove auth header, use api_key param only
+                  'Content-Type': 'application/json',
                 },
                 timeout: 10000, // 10 second timeout
               });
