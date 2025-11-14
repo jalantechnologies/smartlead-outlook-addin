@@ -300,18 +300,12 @@ const App: React.FC = () => {
 
   return (
     <div className="container">
-      <div className="header">
-        <h1>Smartlead</h1>
-        <p>Add email contacts to your campaigns</p>
-      </div>
-
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
 
       {emailContact ? (
         <>
           <div className="section">
-            <h2 className="section-title">Contact Information</h2>
             <div className="email-info">
               <div className="email-icon">
                 {getInitials(emailContact.displayName)}
