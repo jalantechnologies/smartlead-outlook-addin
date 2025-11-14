@@ -73,7 +73,19 @@ const App: React.FC = () => {
 
   const extractEmailFromMessage = () => {
     try {
-      Office.context.mailbox.item?.from.getAsync((result) => {
+      // Check if Office.context.mailbox.item exists
+      if (!Office.context.mailbox.item) {
+        setError('No email item found. Please open an email message.');
+        return;
+      }
+
+      // Check if from property exists
+      if (!Office.context.mailbox.item.from) {
+        setError('Cannot access sender information. Please ensure you have opened an email message.');
+        return;
+      }
+
+      Office.context.mailbox.item.from.getAsync((result) => {
         if (result.status === Office.AsyncResultStatus.Succeeded) {
           const from = result.value;
           const contact: EmailContact = {
@@ -94,12 +106,13 @@ const App: React.FC = () => {
 
           setEmailContact(contact);
         } else {
-          setError('Failed to extract email from message');
+          console.error('Office.js error:', result.error);
+          setError(`Failed to extract email: ${result.error?.message || 'Unknown error'}`);
         }
       });
     } catch (err) {
       console.error('Error extracting email:', err);
-      setError('Failed to extract email from message');
+      setError(`Error: ${err instanceof Error ? err.message : 'Failed to extract email from message'}`);
     }
   };
 
