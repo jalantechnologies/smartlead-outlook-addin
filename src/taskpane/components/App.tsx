@@ -260,7 +260,23 @@ const App: React.FC = () => {
                 <div style={{ marginTop: '8px', fontSize: '13px' }}>
                   {existingLead.first_name && <div>Name: {existingLead.first_name} {existingLead.last_name}</div>}
                   {existingLead.company_name && <div>Company: {existingLead.company_name}</div>}
-                  {existingLead.campaign_name && <div>Campaign: {existingLead.campaign_name}</div>}
+                  {existingLead.lead_campaign_data && existingLead.lead_campaign_data.length > 0 && (
+                    <div style={{ marginTop: '12px' }}>
+                      <strong>Campaign History:</strong>
+                      <div style={{ marginTop: '8px', paddingLeft: '12px', borderLeft: '2px solid #4CAF50' }}>
+                        {existingLead.lead_campaign_data.map((campaignData: any, index: number) => (
+                          <div key={index} style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: index < existingLead.lead_campaign_data.length - 1 ? '1px solid #e0e0e0' : 'none' }}>
+                            <div style={{ fontWeight: '500' }}>{campaignData.campaign_name}</div>
+                            {campaignData.client_email && (
+                              <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                                Client: {campaignData.client_email}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : emailContact ? (
