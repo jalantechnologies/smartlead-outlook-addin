@@ -50,6 +50,10 @@ module.exports = (env, argv) => {
             from: "assets",
             to: "assets",
           },
+          {
+            from: "src/index.html",
+            to: "index.html",
+          },
         ],
       }),
     ],

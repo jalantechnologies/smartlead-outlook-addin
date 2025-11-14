@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smartlead Outlook Add-in</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin: 40px 0;
+            text-align: left;
+        }
+
+        .feature {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .feature h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .feature p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .cta {
+            margin-top: 40px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 16px 32px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            margin: 8px;
+        }
+
+        .button:hover {
+            background: #5568d3;
+        }
+
+        .button-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .button-secondary:hover {
+            background: #f8f9fa;
+        }
+
+        .install-steps {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 32px;
+            margin: 40px 0;
+            text-align: left;
+        }
+
+        .install-steps h2 {
+            color: #333;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .install-steps ol {
+            list-style-position: inside;
+            color: #666;
+        }
+
+        .install-steps li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .code {
+            background: #333;
+            color: #fff;
+            padding: 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            margin: 16px 0;
+            text-align: left;
+            overflow-x: auto;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #e0e0e0;
+            color: #999;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="./assets/icon-80.png" alt="Smartlead Logo" class="logo">
+        <h1>Smartlead Outlook Add-in</h1>
+        <p class="subtitle">Add email contacts to your Smartlead campaigns directly from Outlook</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📧</div>
+                <h3>Email Extraction</h3>
+                <p>Automatically extract sender information from any email</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <h3>Campaign Selection</h3>
+                <p>View and select from all your Smartlead campaigns</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>One-Click Add</h3>
+                <p>Add contacts to campaigns with a single click</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔄</div>
+                <h3>Smart Updates</h3>
+                <p>Automatically handles new and existing leads</p>
+            </div>
+        </div>
+
+        <div class="install-steps">
+            <h2>Quick Installation</h2>
+            <ol>
+                <li>Download the <a href="./manifest.xml" download>manifest.xml</a> file</li>
+                <li>Open <a href="https://outlook.office.com" target="_blank">Outlook Web</a></li>
+                <li>Open any email message</li>
+                <li>Click <strong>...</strong> → <strong>Get Add-ins</strong> → <strong>My add-ins</strong></li>
+                <li>Click <strong>+ Add a custom add-in</strong> → <strong>Add from file</strong></li>
+                <li>Upload the manifest.xml file</li>
+                <li>Click <strong>Install</strong></li>
+            </ol>
+        </div>
+
+        <div class="cta">
+            <a href="./manifest.xml" download class="button">Download Manifest</a>
+            <a href="https://github.com/jalantechnologies/smartlead-outlook-addin" target="_blank" class="button button-secondary">View on GitHub</a>
+        </div>
+
+        <footer>
+            <p>Built for Jalan Technologies | <a href="https://github.com/jalantechnologies/smartlead-outlook-addin/blob/main/README.md" target="_blank">Documentation</a> | <a href="https://smartlead.ai" target="_blank">Smartlead</a></p>
+        </footer>
+    </div>
+</body>
+</html>
