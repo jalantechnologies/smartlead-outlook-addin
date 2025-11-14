@@ -261,44 +261,40 @@ const App: React.FC = () => {
                 Checking if lead exists...
               </div>
             ) : existingLead ? (
-              <div className="success-message" style={{ marginTop: '12px' }}>
-                <strong>Lead exists in Smartlead</strong>
-                <div style={{ marginTop: '8px', fontSize: '13px' }}>
-                  {existingLead.first_name && (
-                    <div>
-                      Name:{' '}
-                      <a
-                        href={`https://app.smartlead.ai/app/crm/lists/all-leads-old`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: '#1a73e8', textDecoration: 'none' }}
-                      >
-                        {existingLead.first_name} {existingLead.last_name}
-                      </a>
-                    </div>
-                  )}
-                  {existingLead.company_name && <div>Company: {existingLead.company_name}</div>}
-                  {existingLead.created_at && (
-                    <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                      Added: {new Date(existingLead.created_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
+              <div className="success-message" style={{ marginTop: '12px', padding: '10px' }}>
+                <div style={{ fontSize: '13px' }}>
+                  <div style={{ marginBottom: '6px' }}>
+                    <strong>Lead exists:</strong>{' '}
+                    <a
+                      href={`https://app.smartlead.ai/app/crm/lists/all-leads-old`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#1a73e8', textDecoration: 'none' }}
+                    >
+                      {existingLead.first_name} {existingLead.last_name}
+                    </a>
+                  </div>
+                  {existingLead.company_name && (
+                    <div style={{ fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+                      {existingLead.company_name}
                     </div>
                   )}
                   {existingLead.lead_campaign_data && existingLead.lead_campaign_data.length > 0 && (
-                    <div style={{ marginTop: '12px' }}>
-                      <strong>Campaign History:</strong>
-                      <div style={{ marginTop: '8px', paddingLeft: '12px', borderLeft: '2px solid #4CAF50' }}>
+                    <div style={{ marginTop: '8px' }}>
+                      <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '6px', color: '#107c10' }}>
+                        Campaigns ({existingLead.lead_campaign_data.length}):
+                      </div>
+                      <div style={{ paddingLeft: '8px', borderLeft: '2px solid #4CAF50' }}>
                         {existingLead.lead_campaign_data.map((campaignData: any, index: number) => (
-                          <div key={index} style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: index < existingLead.lead_campaign_data.length - 1 ? '1px solid #e0e0e0' : 'none' }}>
-                            <div style={{ fontWeight: '500' }}>{campaignData.campaign_name}</div>
-                            {campaignData.client_email && (
-                              <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                                Client: {campaignData.client_email}
+                          <div key={index} style={{ marginBottom: '6px', fontSize: '12px' }}>
+                            <div style={{ fontWeight: '500', color: '#333' }}>{campaignData.campaign_name}</div>
+                            {campaignData.created_at && (
+                              <div style={{ fontSize: '11px', color: '#666' }}>
+                                Added: {new Date(campaignData.created_at).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
                               </div>
                             )}
                           </div>

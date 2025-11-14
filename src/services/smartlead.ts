@@ -61,7 +61,7 @@ class SmartleadService {
   }
 
   /**
-   * Check if a lead exists in Smartlead by email and get details
+   * Check if a lead exists in Smartlead by email and get details with campaign dates
    */
   async getLeadByEmail(email: string): Promise<SmartleadLead | null> {
     try {
@@ -73,7 +73,40 @@ class SmartleadService {
       });
       // API returns a single object when lead is found, not an array
       if (response.data && response.data.id) {
-        return response.data;
+        const lead = response.data;
+
+        // Fetch campaign join dates for each campaign
+        if (lead.lead_campaign_data && lead.lead_campaign_data.length > 0) {
+          const campaignPromises = lead.lead_campaign_data.map(async (campaignData: any) => {
+            try {
+              const campResponse = await this.api.get(`/campaigns/${campaignData.campaign_id}/leads`, {
+                params: {
+                  api_key: this.apiKey,
+                  limit: 1000, // Get enough leads to find this one
+                },
+              });
+
+              // Find this lead in the campaign's lead list
+              const campaignLeads = campResponse.data?.data || [];
+              const leadInCampaign = campaignLeads.find((cl: any) => cl.lead?.email === email);
+
+              if (leadInCampaign && leadInCampaign.created_at) {
+                return {
+                  ...campaignData,
+                  created_at: leadInCampaign.created_at,
+                };
+              }
+              return campaignData;
+            } catch (err) {
+              console.error(`Error fetching campaign ${campaignData.campaign_id} details:`, err);
+              return campaignData;
+            }
+          });
+
+          lead.lead_campaign_data = await Promise.all(campaignPromises);
+        }
+
+        return lead;
       }
       return null;
     } catch (error) {
