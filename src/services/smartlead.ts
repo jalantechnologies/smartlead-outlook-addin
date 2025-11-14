@@ -61,9 +61,9 @@ class SmartleadService {
   }
 
   /**
-   * Check if a lead exists in Smartlead by email
+   * Check if a lead exists in Smartlead by email and get details
    */
-  async checkLeadExists(email: string): Promise<boolean> {
+  async getLeadByEmail(email: string): Promise<SmartleadLead | null> {
     try {
       const response = await this.api.get('/leads', {
         params: {
@@ -71,10 +71,13 @@ class SmartleadService {
           email: email,
         },
       });
-      return response.data && response.data.length > 0;
+      if (response.data && response.data.length > 0) {
+        return response.data[0];
+      }
+      return null;
     } catch (error) {
-      console.error('Error checking if lead exists:', error);
-      return false;
+      console.error('Error fetching lead:', error);
+      return null;
     }
   }
 }

@@ -10,8 +10,11 @@ const App: React.FC = () => {
   const [apiKey, setApiKey] = useState<string>('');
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [campaigns, setCampaigns] = useState<SmartleadCampaign[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCampaignId, setSelectedCampaignId] = useState<string>('');
   const [emailContact, setEmailContact] = useState<EmailContact | null>(null);
+  const [existingLead, setExistingLead] = useState<any | null>(null);
+  const [checkingLead, setCheckingLead] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -29,6 +32,12 @@ const App: React.FC = () => {
       setLoading(false);
     }
   }, [apiKey]);
+
+  useEffect(() => {
+    if (apiKey && emailContact?.email) {
+      checkLeadExists();
+    }
+  }, [emailContact, apiKey]);
 
   const loadApiKey = () => {
     try {
@@ -62,12 +71,34 @@ const App: React.FC = () => {
       setError('');
       const service = new SmartleadService(apiKey);
       const campaignList = await service.getCampaigns();
-      setCampaigns(campaignList);
+
+      // Filter unarchived campaigns and sort alphabetically
+      const filteredCampaigns = campaignList
+        .filter(campaign => campaign.status !== 'ARCHIVED' && campaign.status !== 'archived')
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      setCampaigns(filteredCampaigns);
     } catch (err: any) {
       setError(err.message || 'Failed to load campaigns. Please check your API key.');
       setShowSettings(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkLeadExists = async () => {
+    if (!emailContact?.email) return;
+
+    try {
+      setCheckingLead(true);
+      const service = new SmartleadService(apiKey);
+      const lead = await service.getLeadByEmail(emailContact.email);
+      setExistingLead(lead);
+    } catch (err) {
+      console.error('Error checking lead:', err);
+      setExistingLead(null);
+    } finally {
+      setCheckingLead(false);
     }
   };
 
@@ -196,7 +227,7 @@ const App: React.FC = () => {
   return (
     <div className="container">
       <div className="header">
-        <h1>Smartlead Integration</h1>
+        <h1>Smartlead</h1>
         <p>Add email contacts to your campaigns</p>
       </div>
 
@@ -218,31 +249,72 @@ const App: React.FC = () => {
                 <div className="email-address">{emailContact.email}</div>
               </div>
             </div>
+
+            {checkingLead ? (
+              <div className="info-message" style={{ marginTop: '12px' }}>
+                Checking if lead exists...
+              </div>
+            ) : existingLead ? (
+              <div className="success-message" style={{ marginTop: '12px' }}>
+                <strong>Lead exists in Smartlead</strong>
+                <div style={{ marginTop: '8px', fontSize: '13px' }}>
+                  {existingLead.first_name && <div>Name: {existingLead.first_name} {existingLead.last_name}</div>}
+                  {existingLead.company_name && <div>Company: {existingLead.company_name}</div>}
+                  {existingLead.campaign_name && <div>Campaign: {existingLead.campaign_name}</div>}
+                </div>
+              </div>
+            ) : emailContact ? (
+              <div className="info-message" style={{ marginTop: '12px' }}>
+                Lead does not exist in Smartlead
+              </div>
+            ) : null}
           </div>
 
           <div className="section">
             <h2 className="section-title">Select Campaign</h2>
 
             {campaigns.length > 0 ? (
-              <div className="form-group">
-                <label className="form-label" htmlFor="campaign-select">
-                  Choose a Smartlead campaign
-                </label>
-                <select
-                  id="campaign-select"
-                  className="form-select"
-                  value={selectedCampaignId}
-                  onChange={(e) => setSelectedCampaignId(e.target.value)}
-                  disabled={submitting}
-                >
-                  <option value="">Select a campaign...</option>
-                  {campaigns.map((campaign) => (
-                    <option key={campaign.id} value={campaign.id}>
-                      {campaign.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="campaign-search">
+                    Search campaigns
+                  </label>
+                  <input
+                    id="campaign-search"
+                    type="text"
+                    className="form-input"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Type to search..."
+                    disabled={submitting}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="campaign-select">
+                    Choose a Smartlead campaign
+                  </label>
+                  <select
+                    id="campaign-select"
+                    className="form-select"
+                    value={selectedCampaignId}
+                    onChange={(e) => setSelectedCampaignId(e.target.value)}
+                    disabled={submitting}
+                  >
+                    <option value="">Select a campaign...</option>
+                    {campaigns
+                      .filter(campaign =>
+                        campaign.name.toLowerCase().includes(searchQuery.toLowerCase())
+                      )
+                      .map((campaign) => (
+                        <option key={campaign.id} value={campaign.id}>
+                          {campaign.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              </>
+
             ) : (
               <div className="no-campaigns">
                 <p>No campaigns found in your Smartlead account.</p>
