@@ -23,6 +23,17 @@ const App: React.FC = () => {
 
   useEffect(() => {
     loadApiKey();
+
+    // Handle email item changes when taskpane is pinned
+    if (Office && Office.context && Office.context.mailbox) {
+      Office.context.mailbox.addHandlerAsync(
+        Office.EventType.ItemChanged,
+        () => {
+          // When user switches to a different email, refresh the contact info
+          extractEmailFromMessage();
+        }
+      );
+    }
   }, []);
 
   useEffect(() => {
