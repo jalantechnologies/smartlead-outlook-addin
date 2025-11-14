@@ -266,7 +266,7 @@ const App: React.FC = () => {
                   <div style={{ marginBottom: '6px' }}>
                     <strong>Lead exists:</strong>{' '}
                     <a
-                      href={`https://app.smartlead.ai/app/crm/lists/all-leads-old`}
+                      href={`https://app.smartlead.ai/app/lead/${existingLead.id}/view`}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ color: '#1a73e8', textDecoration: 'none' }}
