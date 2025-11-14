@@ -65,14 +65,15 @@ class SmartleadService {
    */
   async getLeadByEmail(email: string): Promise<SmartleadLead | null> {
     try {
-      const response = await this.api.get('/leads', {
+      const response = await this.api.get('/leads/', {
         params: {
           api_key: this.apiKey,
           email: email,
         },
       });
-      if (response.data && response.data.length > 0) {
-        return response.data[0];
+      // API returns a single object when lead is found, not an array
+      if (response.data && response.data.id) {
+        return response.data;
       }
       return null;
     } catch (error) {
