@@ -87,6 +87,9 @@ class SmartleadService {
                   api_key: this.apiKey,
                   limit: 1000,
                 },
+                headers: {
+                  'Authorization': '', // Remove auth header, use api_key param only
+                },
                 timeout: 10000, // 10 second timeout
               });
 
