@@ -87,57 +87,36 @@ const App: React.FC = () => {
         return;
       }
 
-      // Try to get sender information
-      // Different Outlook versions may have different API availability
-      if (item.from && typeof item.from.getAsync === 'function') {
-        // Async API (preferred)
-        item.from.getAsync((result) => {
-          if (result.status === Office.AsyncResultStatus.Succeeded && result.value) {
-            const from = result.value;
-            const contact: EmailContact = {
-              email: from.emailAddress,
-              displayName: from.displayName,
-            };
-
-            // Parse first and last name from display name
-            if (from.displayName) {
-              const nameParts = from.displayName.trim().split(' ');
-              if (nameParts.length > 1) {
-                contact.firstName = nameParts[0];
-                contact.lastName = nameParts.slice(1).join(' ');
-              } else {
-                contact.firstName = from.displayName;
-              }
-            }
-
-            setEmailContact(contact);
-            setError(''); // Clear any previous errors
-          } else {
-            console.error('getAsync failed:', result.error);
-            setError('Unable to read sender information. The email may not be fully loaded.');
-          }
-        });
-      } else if (item.from) {
-        // Synchronous property access (fallback for older versions)
+      // Get sender information - direct property access for Outlook Web
+      if (item.from) {
         const from = item.from as any;
-        if (from.emailAddress && from.displayName) {
+
+        // Check if we have the necessary information
+        if (from.emailAddress || from.displayName) {
           const contact: EmailContact = {
-            email: from.emailAddress,
-            displayName: from.displayName,
+            email: from.emailAddress || '',
+            displayName: from.displayName || from.emailAddress || '',
           };
 
-          if (from.displayName) {
-            const nameParts = from.displayName.trim().split(' ');
+          // Parse first and last name from display name
+          if (contact.displayName) {
+            const nameParts = contact.displayName.trim().split(' ');
             if (nameParts.length > 1) {
               contact.firstName = nameParts[0];
               contact.lastName = nameParts.slice(1).join(' ');
             } else {
-              contact.firstName = from.displayName;
+              contact.firstName = contact.displayName;
             }
           }
 
+          // Validate we have at least an email
+          if (!contact.email) {
+            setError('Email address not found. Please ensure the message has a sender.');
+            return;
+          }
+
           setEmailContact(contact);
-          setError('');
+          setError(''); // Clear any previous errors
         } else {
           setError('Sender information not available for this message.');
         }
