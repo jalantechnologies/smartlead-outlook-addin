@@ -301,13 +301,21 @@ class SmartleadService {
 ## Support
 
 For issues with:
-- **This add-in**: Check the troubleshooting section above
+- **This add-in**: Contact developer@bettrhq.com or check the troubleshooting section above
 - **Smartlead API**: Visit [Smartlead API Documentation](https://api.smartlead.ai/)
 - **Office Add-ins**: Visit [Microsoft Office Add-ins Documentation](https://docs.microsoft.com/en-us/office/dev/add-ins/)
+
+## About
+
+This add-in is built and maintained by [Better Software](https://bettrhq.com), a product of Jalan Technology Consulting Private Limited.
+
+For inquiries, contact: developer@bettrhq.com
 
 ## License
 
 MIT
+
+© 2025 Jalan Technology Consulting Private Limited. All rights reserved.
 
 ## Contributing
 

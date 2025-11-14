@@ -169,13 +169,13 @@ Click on any email message to open it (required for next step)
 ## Getting Help
 
 ### Can't install the add-in?
-Contact your IT admin or the person who shared the manifest file with you.
+Contact your IT admin or email developer@bettrhq.com
 
 ### Add-in technical issues?
 1. Check this troubleshooting guide first
 2. Try in incognito/private browsing mode
 3. Check if Smartlead is working: [app.smartlead.ai](https://app.smartlead.ai)
-4. Contact your team admin
+4. Contact developer@bettrhq.com
 
 ### Smartlead account issues?
 Contact Smartlead support: [smartlead.ai/support](https://smartlead.ai)
@@ -240,4 +240,7 @@ Before asking for help, try these:
 
 **Enjoy using Smartlead with Outlook!** 🎉
 
-If you have questions, contact the person who shared this guide with you.
+Built by [Better Software](https://bettrhq.com)
+© 2025 Jalan Technology Consulting Private Limited
+
+For support: developer@bettrhq.com

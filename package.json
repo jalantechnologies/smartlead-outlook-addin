@@ -1,6 +1,6 @@
 {
   "name": "smartlead-outlook-addin",
-  "version": "1.0.0",
+  "version": "1.6.2",
   "description": "Outlook add-in to add email contacts as leads to Smartlead campaigns",
   "main": "index.js",
   "scripts": {
@@ -11,9 +11,15 @@
   "keywords": [
     "outlook",
     "add-in",
-    "smartlead"
+    "smartlead",
+    "better-software"
   ],
-  "author": "",
+  "author": "Jalan Technology Consulting Private Limited <developer@bettrhq.com>",
+  "homepage": "https://jalantechnologies.github.io/smartlead-outlook-addin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jalantechnologies/smartlead-outlook-addin.git"
+  },
   "license": "MIT",
   "dependencies": {
     "@fluentui/react": "^8.118.0",
