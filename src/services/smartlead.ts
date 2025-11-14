@@ -84,16 +84,15 @@ class SmartleadService {
           const campaignPromises = lead.lead_campaign_data.map(async (campaignData: any) => {
             try {
               console.log(`Fetching campaign ${campaignData.campaign_id} leads...`);
-              // Use direct axios call without Authorization header
-              const campResponse = await axios.get(`${BASE_URL}/campaigns/${campaignData.campaign_id}/leads`, {
-                params: {
-                  api_key: this.apiKey,
-                  limit: 1000,
-                },
+              // Build URL with query parameters manually to avoid any encoding issues
+              const url = `${BASE_URL}/campaigns/${campaignData.campaign_id}/leads?api_key=${this.apiKey}&limit=500`;
+              console.log(`Fetching URL: ${url}`);
+
+              const campResponse = await axios.get(url, {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                timeout: 10000, // 10 second timeout
+                timeout: 15000,
               });
 
               // Find this lead in the campaign's lead list
@@ -116,8 +115,11 @@ class SmartleadService {
               }
               console.warn(`Lead not found in campaign ${campaignData.campaign_id} leads list`);
               return campaignData;
-            } catch (err) {
+            } catch (err: any) {
               console.error(`Error fetching campaign ${campaignData.campaign_id} details:`, err);
+              console.error(`Error response:`, err.response?.data);
+              console.error(`Error status:`, err.response?.status);
+              console.error(`Error headers:`, err.response?.headers);
               return campaignData;
             }
           });
