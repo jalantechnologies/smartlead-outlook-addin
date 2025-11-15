@@ -129,6 +129,14 @@ const App: React.FC = () => {
     });
   }, [campaigns, searchQuery]);
 
+  // Check if lead has any campaign ending with "- Leads"
+  const hasLeadsCampaign = React.useMemo(() => {
+    if (!existingLead || !existingLead.lead_campaign_data) return false;
+    return existingLead.lead_campaign_data.some((campaignData: any) =>
+      campaignData.campaign_name && campaignData.campaign_name.trim().endsWith('- Leads')
+    );
+  }, [existingLead]);
+
   // Auto-select when only 1 campaign matches
   useEffect(() => {
     if (filteredCampaigns.length === 1) {
@@ -433,22 +441,26 @@ const App: React.FC = () => {
                     disabled={submitting}
                   />
                   <div className="quick-filters">
-                    <button
-                      type="button"
-                      className="quick-filter-btn"
-                      onClick={() => addQuickFilter('HR')}
-                      disabled={submitting}
-                    >
-                      HR
-                    </button>
-                    <button
-                      type="button"
-                      className="quick-filter-btn"
-                      onClick={() => addQuickFilter('Interview')}
-                      disabled={submitting}
-                    >
-                      Interview
-                    </button>
+                    {!hasLeadsCampaign && (
+                      <button
+                        type="button"
+                        className="quick-filter-btn"
+                        onClick={() => addQuickFilter('HR')}
+                        disabled={submitting}
+                      >
+                        HR
+                      </button>
+                    )}
+                    {hasLeadsCampaign && (
+                      <button
+                        type="button"
+                        className="quick-filter-btn"
+                        onClick={() => addQuickFilter('Interview')}
+                        disabled={submitting}
+                      >
+                        Interview
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="quick-filter-btn"

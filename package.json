@@ -1,6 +1,6 @@
 {
   "name": "smartlead-outlook-addin",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Outlook add-in to add email contacts as leads to Smartlead campaigns",
   "main": "index.js",
   "scripts": {
