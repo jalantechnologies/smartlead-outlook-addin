@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack serve --mode development --config webpack.config.js",
     "build": "webpack --mode production",
-    "validate": "office-addin-manifest validate manifest.xml"
+    "validate": "office-addin-manifest validate manifest.xml",
+    "clean-prompts": "node scripts/clean-prompts.js"
   },
   "keywords": [
     "outlook",

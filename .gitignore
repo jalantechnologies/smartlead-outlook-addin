@@ -31,3 +31,6 @@ certs/
 
 # Office Add-in specific
 *.OfficeAddin
+
+# Script backups
+backups/
