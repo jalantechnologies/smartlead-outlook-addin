@@ -81,21 +81,44 @@ class SmartleadService {
         if (lead.lead_campaign_data && lead.lead_campaign_data.length > 0) {
           const campaignPromises = lead.lead_campaign_data.map(async (campaignData: any) => {
             try {
-              // Build URL with query parameters manually - API max limit is 100
-              const url = `${BASE_URL}/campaigns/${campaignData.campaign_id}/leads?api_key=${this.apiKey}&limit=100`;
+              // Paginate through campaign leads to find this lead
+              let offset = 0;
+              const limit = 100; // API max limit
+              let leadInCampaign = null;
+              let totalLeads = 0;
 
-              const campResponse = await axios.get(url, {
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                timeout: 15000,
-              });
+              do {
+                // Build URL with pagination parameters
+                const url = `${BASE_URL}/campaigns/${campaignData.campaign_id}/leads?api_key=${this.apiKey}&offset=${offset}&limit=${limit}`;
 
-              // Find this lead in the campaign's lead list
-              const campaignLeads = campResponse.data?.data || [];
-              const leadInCampaign = campaignLeads.find((cl: any) =>
-                cl.lead?.email?.toLowerCase() === email.toLowerCase()
-              );
+                const campResponse = await axios.get(url, {
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  timeout: 15000,
+                });
+
+                // Get total leads count from first response
+                if (offset === 0) {
+                  totalLeads = campResponse.data?.total_leads || 0;
+                }
+
+                // Find this lead in the current page
+                const campaignLeads = campResponse.data?.data || [];
+                leadInCampaign = campaignLeads.find((cl: any) =>
+                  cl.lead?.email?.toLowerCase() === email.toLowerCase()
+                );
+
+                // If found, break out of loop
+                if (leadInCampaign) {
+                  break;
+                }
+
+                // Move to next page
+                offset += limit;
+
+                // Continue if there are more leads to check
+              } while (offset < totalLeads);
 
               if (leadInCampaign && leadInCampaign.created_at) {
                 return {
