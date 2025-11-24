@@ -310,7 +310,45 @@ const App: React.FC = () => {
 
       await service.addLeadToCampaign(parseInt(selectedCampaignId), lead);
 
-      setSuccess(`Successfully added ${emailContact.email} to campaign!`);
+      // Automatically pause lead in all other campaigns
+      let pausedCount = 0;
+      let totalToPause = 0;
+      if (existingLead && existingLead.id && existingLead.lead_campaign_data) {
+        // Get all campaigns except the newly selected one
+        const otherCampaigns = existingLead.lead_campaign_data.filter(
+          (campaignData: any) => campaignData.campaign_id !== parseInt(selectedCampaignId)
+        );
+
+        totalToPause = otherCampaigns.length;
+
+        if (totalToPause > 0) {
+          // Pause lead in each other campaign
+          const pausePromises = otherCampaigns.map(async (campaignData: any) => {
+            const success = await service.pauseLeadInCampaign(
+              campaignData.campaign_id,
+              existingLead.id
+            );
+            if (success) pausedCount++;
+            return success;
+          });
+
+          await Promise.all(pausePromises);
+        }
+      }
+
+      // Build success message
+      let successMsg = `Successfully added ${emailContact.email} to campaign!`;
+      if (totalToPause > 0) {
+        if (pausedCount === totalToPause) {
+          successMsg += ` Paused in ${pausedCount} other campaign${pausedCount > 1 ? 's' : ''}.`;
+        } else if (pausedCount > 0) {
+          successMsg += ` Paused in ${pausedCount} of ${totalToPause} other campaigns.`;
+        } else {
+          successMsg += ` Warning: Failed to pause in other campaigns.`;
+        }
+      }
+
+      setSuccess(successMsg);
       setJustAdded(true);
       setNotes(''); // Clear notes after successful addition
 

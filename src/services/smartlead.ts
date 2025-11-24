@@ -63,6 +63,31 @@ class SmartleadService {
   }
 
   /**
+   * Pause a lead in a specific campaign
+   */
+  async pauseLeadInCampaign(
+    campaignId: number,
+    leadId: number
+  ): Promise<boolean> {
+    try {
+      const response = await this.api.post(
+        `/campaigns/${campaignId}/leads/${leadId}/pause`,
+        {},
+        {
+          params: {
+            api_key: this.apiKey,
+          },
+        }
+      );
+      return response.data?.success || true;
+    } catch (error: any) {
+      console.error(`Error pausing lead in campaign ${campaignId}:`, error);
+      // Don't throw - we want to continue even if some pauses fail
+      return false;
+    }
+  }
+
+  /**
    * Check if a lead exists in Smartlead by email and get details with campaign dates
    */
   async getLeadByEmail(email: string): Promise<SmartleadLead | null> {
