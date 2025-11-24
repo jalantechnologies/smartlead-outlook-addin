@@ -20,6 +20,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
   const [justAdded, setJustAdded] = useState<boolean>(false);
+  const [notes, setNotes] = useState<string>('');
 
   // Handle email item changes when taskpane is pinned
   const handleItemChanged = React.useCallback(() => {
@@ -30,6 +31,7 @@ const App: React.FC = () => {
     setError('');
     setSuccess('');
     setJustAdded(false);
+    setNotes('');
 
     // Extract new email contact info from the newly selected email
     try {
@@ -284,16 +286,33 @@ const App: React.FC = () => {
 
       const service = new SmartleadService(apiKey);
 
-      const lead = {
+      const lead: any = {
         email: emailContact.email,
         first_name: emailContact.firstName || '',
         last_name: emailContact.lastName || '',
       };
 
+      // Preserve existing custom fields and add new note
+      const customFields: any = { ...(existingLead?.custom_fields || {}) };
+
+      // Add campaign-specific note if provided
+      if (notes.trim()) {
+        customFields[`note_campaign_${selectedCampaignId}`] = notes.trim();
+        customFields[`added_date_campaign_${selectedCampaignId}`] = new Date().toISOString();
+      }
+
+      // Mark that this was added from Outlook Add-in
+      if (!customFields.added_from) {
+        customFields.added_from = 'Outlook Add-in';
+      }
+
+      lead.custom_fields = customFields;
+
       await service.addLeadToCampaign(parseInt(selectedCampaignId), lead);
 
       setSuccess(`Successfully added ${emailContact.email} to campaign!`);
       setJustAdded(true);
+      setNotes(''); // Clear notes after successful addition
 
       // Refresh lead data to show updated campaigns
       checkLeadExists();
@@ -396,20 +415,36 @@ const App: React.FC = () => {
                         Campaigns ({existingLead.lead_campaign_data.length}):
                       </div>
                       <div style={{ paddingLeft: '8px', borderLeft: '2px solid #4CAF50' }}>
-                        {existingLead.lead_campaign_data.map((campaignData: any, index: number) => (
-                          <div key={index} style={{ marginBottom: '6px', fontSize: '12px' }}>
-                            <div style={{ fontWeight: '500', color: '#333' }}>{campaignData.campaign_name}</div>
-                            {campaignData.created_at && (
-                              <div style={{ fontSize: '11px', color: '#666' }}>
-                                Added: {new Date(campaignData.created_at).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric'
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                        {existingLead.lead_campaign_data.map((campaignData: any, index: number) => {
+                          const campaignNote = existingLead.custom_fields?.[`note_campaign_${campaignData.campaign_id}`];
+                          return (
+                            <div key={index} style={{ marginBottom: '8px', fontSize: '12px' }}>
+                              <div style={{ fontWeight: '500', color: '#333' }}>{campaignData.campaign_name}</div>
+                              {campaignData.created_at && (
+                                <div style={{ fontSize: '11px', color: '#666' }}>
+                                  Added: {new Date(campaignData.created_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                  })}
+                                </div>
+                              )}
+                              {campaignNote && (
+                                <div style={{
+                                  fontSize: '11px',
+                                  color: '#555',
+                                  marginTop: '4px',
+                                  fontStyle: 'italic',
+                                  backgroundColor: '#f5f5f5',
+                                  padding: '4px 6px',
+                                  borderRadius: '3px'
+                                }}>
+                                  Note: {campaignNote}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -495,6 +530,22 @@ const App: React.FC = () => {
                       No campaigns match your search
                     </div>
                   )}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="campaign-notes">
+                    Notes (optional)
+                  </label>
+                  <textarea
+                    id="campaign-notes"
+                    className="form-input"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Why are you adding this lead to the campaign?"
+                    rows={3}
+                    disabled={submitting}
+                    style={{ resize: 'vertical', fontFamily: 'inherit' }}
+                  />
                 </div>
               </>
 

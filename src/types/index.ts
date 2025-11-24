@@ -9,6 +9,9 @@ export interface SmartleadLead {
   first_name?: string;
   last_name?: string;
   company_name?: string;
+  custom_fields?: {
+    [key: string]: any;
+  };
   [key: string]: any;
 }
 
